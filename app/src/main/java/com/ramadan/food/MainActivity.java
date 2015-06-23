@@ -1,4 +1,4 @@
-package com.punkabhiank.ramadanfoodlocations;
+package com.ramadan.food;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
