@@ -31,6 +31,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".AddLocationActivity"
+            android:label="@string/activity_add_location"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDI6w90qGAAppoUm0Np8CcWxHnFY22cynw" />
