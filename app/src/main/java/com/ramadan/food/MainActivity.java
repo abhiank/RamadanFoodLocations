@@ -1,10 +1,11 @@
 package com.ramadan.food;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -39,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Ramadan Food");
+        toolbar.setTitleTextColor(Color.WHITE);
+
         ParseObject.registerSubclass(Place.class);
         Parse.initialize(this, "Fnl9PAspRVWFfeFo8YrO5tygcgUBKvROSe0BeUgz", "BsyXszdwHaxVdHl8o5iLqH6wPQdNZxP7Y6BF4eoX");
 
@@ -68,34 +74,36 @@ public class MainActivity extends AppCompatActivity {
 
     public void getPlaces(){
 
-        final ProgressDialog pd = new ProgressDialog(MainActivity.this);
-        pd.setCancelable(false);
-        pd.setMessage("Getting locations");
-        pd.show();
+        if(Utils.isNetworkAvailable(this)) {
 
-        ParseQuery<Place> placeParseQuery = ParseQuery.getQuery(Place.class);
-        placeParseQuery.findInBackground(new FindCallback<Place>() {
-            @Override
-            public void done(List<Place> list, ParseException e) {
-                if(e==null) {
-                    mPlaces.clear();
-                    for (Place place : list)
-                        mPlaces.add(place);
+            Utils.showProgressDialogue(this, "Getting Locations");
 
-                    for (Place place : mPlaces) {
-                        map.addMarker(new MarkerOptions().position(place.getLocation())
-                                .title(place.getTitle())
-                                .snippet(place.getDescription()));
-                    }
+            ParseQuery<Place> placeParseQuery = ParseQuery.getQuery(Place.class);
+            placeParseQuery.findInBackground(new FindCallback<Place>() {
+                @Override
+                public void done(List<Place> list, ParseException e) {
+                    if (e == null) {
+                        mPlaces.clear();
+                        for (Place place : list)
+                            mPlaces.add(place);
+
+                        for (Place place : mPlaces) {
+                            map.addMarker(new MarkerOptions().position(place.getLocation())
+                                    .title(place.getTitle())
+                                    .snippet(place.getDescription()));
+                        }
 //                    map.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
-                    pd.hide();
+                        Utils.dismissProgressDialogue();
+                    } else {
+                        Utils.dismissProgressDialogue();
+                        Toast.makeText(MainActivity.this, "Data Error Occurred", Toast.LENGTH_SHORT).show();
+                    }
                 }
-                else{
-                    pd.hide();
-                    Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+            });
+        }
+        else{
+            Toast.makeText(MainActivity.this, "No Internet Available",Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

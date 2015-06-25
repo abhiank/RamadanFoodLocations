@@ -1,13 +1,14 @@
 package com.ramadan.food;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,8 +31,6 @@ public class AddLocationActivity extends AppCompatActivity {
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
-    private TextView mLatitudeTextView;
-    private TextView mLongitudeTextView;
     private EditText mTitleEditText;
     private EditText mDescEditText;
     private Button mSaveButton;
@@ -45,9 +44,14 @@ public class AddLocationActivity extends AppCompatActivity {
         options.compassEnabled(true);
         options.zoomControlsEnabled(true);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Add new Location");
+        toolbar.setTitleTextColor(Color.WHITE);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        mLatitudeTextView = (TextView) findViewById(R.id.latitudeTextView);
-        mLongitudeTextView = (TextView) findViewById(R.id.longitudeTextView);
         mTitleEditText = (EditText) findViewById(R.id.titleEditText);
         mDescEditText = (EditText) findViewById(R.id.descEditText);
         mSaveButton = (Button) findViewById(R.id.saveButton);
@@ -120,7 +124,6 @@ public class AddLocationActivity extends AppCompatActivity {
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        Toast.makeText(AddLocationActivity.this,"Connected",Toast.LENGTH_SHORT).show();
                         LocationServices.FusedLocationApi.requestLocationUpdates(
                                 mGoogleApiClient, createLocationRequest(), new LocationListener() {
                                     @Override
@@ -132,8 +135,6 @@ public class AddLocationActivity extends AppCompatActivity {
                                             Toast.makeText(AddLocationActivity.this,
                                                     "Lat - " + location.getLatitude() +
                                                     " long - " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                                            mLatitudeTextView.setText("Lat - " + location.getLatitude());
-                                            mLongitudeTextView.setText("long - " + location.getLongitude());
                                             mSaveButton.setEnabled(true);
                                             LocationServices.FusedLocationApi.removeLocationUpdates(
                                                     mGoogleApiClient, this);
