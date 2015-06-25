@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,29 +10,61 @@
         android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/titleEditText"
         android:layout_below="@+id/toolbar" />
 
-    <EditText
-        android:id="@+id/titleEditText"
+    <LinearLayout
+        android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Title"
-        android:layout_above="@+id/descEditText" />
+        android:orientation="vertical"
+        android:background="@color/white_transparent"
+        android:layout_alignParentBottom="true">
 
-    <EditText
-        android:id="@+id/descEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Description"
-        android:layout_above="@+id/saveButton"/>
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/titleEditText"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:hint="Enter Title"
+            android:inputType="textPersonName"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/primary"
+            app:met_errorColor="#e51c23"
+            app:met_floatingLabelTextSize="15sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textSize="20sp"
+            android:imeOptions="actionNext"
+            />
 
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Location"
-        android:enabled="false"
-        android:layout_alignParentBottom="true"/>
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/descEditText"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:hint="Description"
+            android:inputType="textPersonName"
+            app:met_floatingLabelTextSize="15sp"
+            app:met_floatingLabel="highlight"
+            app:met_primaryColor="@color/primary"
+            app:met_errorColor="#e51c23"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textSize="20sp"
+            android:imeOptions="actionDone"/>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Add Location"
+            android:enabled="false"
+            android:textStyle="bold"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_selector_green"/>
+
+    </LinearLayout>
+
+
 
 </RelativeLayout>

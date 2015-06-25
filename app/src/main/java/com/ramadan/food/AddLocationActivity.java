@@ -1,6 +1,5 @@
 package com.ramadan.food;
 
-import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -76,24 +75,30 @@ public class AddLocationActivity extends AppCompatActivity {
                 parseObject.put("title",mTitleEditText.getText().toString());
                 parseObject.put("desc",mDescEditText.getText().toString());
 
-                final ProgressDialog progressDialog = new ProgressDialog(AddLocationActivity.this);
-                progressDialog.setTitle("Saving Location");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-                parseObject.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        progressDialog.hide();
-                        Toast.makeText(AddLocationActivity.this , "Added Location", Toast.LENGTH_SHORT).show();
-                        onBackPressed();
-                    }
-                });
+                if(Utils.isNetworkAvailable(AddLocationActivity.this)) {
+
+                    Utils.showProgressDialogue(AddLocationActivity.this, "Saving Location");
+                    parseObject.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Utils.dismissProgressDialogue();
+                            Toast.makeText(AddLocationActivity.this , "Added Location", Toast.LENGTH_SHORT).show();
+                            onBackPressed();
+                            }
+                    });
+                }
+                else{
+                    Toast.makeText(AddLocationActivity.this, "No Internet Available",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         if (map!=null){
 
             map.setMyLocationEnabled(true);
+            float scale = getResources().getDisplayMetrics().density;
+            int dpAsPixels = (int) (205*scale + 0.5f);
+            map.setPadding(0,0,0,dpAsPixels);
             UiSettings settings = map.getUiSettings();
             settings.setCompassEnabled(true);
             settings.setZoomControlsEnabled(true);
@@ -136,8 +141,7 @@ public class AddLocationActivity extends AppCompatActivity {
                                                     "Lat - " + location.getLatitude() +
                                                     " long - " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                                             mSaveButton.setEnabled(true);
-                                            LocationServices.FusedLocationApi.removeLocationUpdates(
-                                                    mGoogleApiClient, this);
+                                            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
                                         }
                                     }
                                 });
