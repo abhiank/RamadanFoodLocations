@@ -42,35 +42,6 @@ public class MainActivity extends AppCompatActivity {
         ParseObject.registerSubclass(Place.class);
         Parse.initialize(this, "Fnl9PAspRVWFfeFo8YrO5tygcgUBKvROSe0BeUgz", "BsyXszdwHaxVdHl8o5iLqH6wPQdNZxP7Y6BF4eoX");
 
-        final ProgressDialog pd = new ProgressDialog(MainActivity.this);
-        pd.setCancelable(false);
-        pd.setMessage("Getting locations");
-        pd.show();
-
-        ParseQuery<Place> placeParseQuery = ParseQuery.getQuery(Place.class);
-        placeParseQuery.findInBackground(new FindCallback<Place>() {
-            @Override
-            public void done(List<Place> list, ParseException e) {
-                if(e==null) {
-                    mPlaces.clear();
-                    for (Place place : list)
-                        mPlaces.add(place);
-
-                    for (Place place : mPlaces) {
-                        map.addMarker(new MarkerOptions().position(place.getLocation())
-                                .title(place.getTitle())
-                                .snippet(place.getDescription()));
-                    }
-                    map.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
-                    pd.hide();
-                }
-                else{
-                    pd.hide();
-                    Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
         GoogleMapOptions options = new GoogleMapOptions();
         options.compassEnabled(true);
         options.zoomControlsEnabled(true);
@@ -90,6 +61,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        getPlaces();
+    }
+
+    public void getPlaces(){
+
+        final ProgressDialog pd = new ProgressDialog(MainActivity.this);
+        pd.setCancelable(false);
+        pd.setMessage("Getting locations");
+        pd.show();
+
+        ParseQuery<Place> placeParseQuery = ParseQuery.getQuery(Place.class);
+        placeParseQuery.findInBackground(new FindCallback<Place>() {
+            @Override
+            public void done(List<Place> list, ParseException e) {
+                if(e==null) {
+                    mPlaces.clear();
+                    for (Place place : list)
+                        mPlaces.add(place);
+
+                    for (Place place : mPlaces) {
+                        map.addMarker(new MarkerOptions().position(place.getLocation())
+                                .title(place.getTitle())
+                                .snippet(place.getDescription()));
+                    }
+//                    map.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
+                    pd.hide();
+                }
+                else{
+                    pd.hide();
+                    Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -98,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_location) {
             Intent intent = new Intent(MainActivity.this, AddLocationActivity.class);
             startActivity(intent);
             return true;

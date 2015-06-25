@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
@@ -81,6 +81,7 @@ public class AddLocationActivity extends AppCompatActivity {
                     public void done(ParseException e) {
                         progressDialog.hide();
                         Toast.makeText(AddLocationActivity.this , "Added Location", Toast.LENGTH_SHORT).show();
+                        onBackPressed();
                     }
                 });
             }
@@ -96,31 +97,38 @@ public class AddLocationActivity extends AppCompatActivity {
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.BANGALORE, 12));
 
-            Log.i("location","init api client");
             buildGoogleApiClient();
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
     protected synchronized void buildGoogleApiClient() {
-        Log.i("location","init api client2");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
-//                        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                                mGoogleApiClient);
-//                        if (mLastLocation != null) {
-//                            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//                            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-//                        }
-                        Log.i("location","connected");
                         Toast.makeText(AddLocationActivity.this,"Connected",Toast.LENGTH_SHORT).show();
                         LocationServices.FusedLocationApi.requestLocationUpdates(
                                 mGoogleApiClient, createLocationRequest(), new LocationListener() {
                                     @Override
                                     public void onLocationChanged(Location location) {
-                                        //if(location.hasAccuracy()) {
+                                        if(location.hasAccuracy()) {
                                             mCurrentLocation = location;
+                                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 12));
+                                            map.animateCamera(CameraUpdateFactory.zoomTo(15), 1500, null);
                                             Toast.makeText(AddLocationActivity.this,
                                                     "Lat - " + location.getLatitude() +
                                                     " long - " + location.getLongitude(), Toast.LENGTH_SHORT).show();
@@ -129,19 +137,17 @@ public class AddLocationActivity extends AppCompatActivity {
                                             mSaveButton.setEnabled(true);
                                             LocationServices.FusedLocationApi.removeLocationUpdates(
                                                     mGoogleApiClient, this);
-                                        //}
+                                        }
                                     }
                                 });
                     }
                     @Override
                     public void onConnectionSuspended(int i) {
-                        Log.i("location","suspended");
                     }
                 })
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
-                        Log.i("location","failed");
                     }
                 })
                 .addApi(LocationServices.API)
